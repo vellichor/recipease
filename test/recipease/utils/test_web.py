@@ -1,13 +1,9 @@
 import test_base
 from recipease.utils.web import get_recipe
 from unittest.mock import Mock,patch
+from fixtures.files import *
 
 import pytest
-
-@pytest.fixture
-def sample_recipe_html():
-  with open('../test/fixtures/sample.html', 'r') as f:
-    yield f.read()
 
 def test_get_recipe(sample_recipe_html):
   with patch('requests.get') as get_patch:

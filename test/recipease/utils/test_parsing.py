@@ -1,4 +1,5 @@
 import test_base
+from fixtures.files import *
 
 import pytest
 from unittest.mock import Mock,patch
@@ -48,3 +49,7 @@ def test_parse_ingredient():
         assert parsed['unit'] is None
       assert test_cases[t]['ingredient'] == parsed['ingredient']['name'] # nested class
       assert 'Ingredient' == parsed['ingredient']['class'].__name__
+
+# not really a unit test exactly. but this will work out all features and we can validate the whole dict.
+def test_parse_recipe():
+  pass
