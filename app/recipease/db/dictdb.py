@@ -4,16 +4,26 @@
 from recipease.db.models import * 
 from recipease.utils.strings import pascal_to_snake
 
+# we can probably do things even more smartly now that i know how to do stupid reflection.
+# the following grabs the column referenced by the foreign key constraint on Recipe.author
+#list(Recipe.__table__.columns['author'].foreign_keys)[0]._colspec
+
 # for a foreign key to class MyClass, the id we are expecting is my_class_id
 def class_to_foreign_key(cls):
   return "{}_id".format(pascal_to_snake(cls.__name__))
 
 def save_list(model_list, session, **kwargs):
   for model_dict in model_list:
-    model_dict.merge(kwargs) # pull in the id column we netted from up top
-    model_id = save_dict(model_dict)
+    model_dict.merge(kwargs) # pull in the foreign key id we netted from up top
+    # don't need to capture the id of this, 
+    # we will always find it using the foreign key
+    save_dict(model_dict)
 
 def save_dict(model_dict, session):
+  # this is where we actually save an object to the database.
+  # we should really make sure we intend to create it and not reuse another!
+  # question: how do we know, based on this model's class and dictionary keys alone, 
+  # what is the "natural key"?
   # normal thing that might have nested dicts or lists in it.
   nested_lists = {}
   for k,v in model_dict.iteritems():
