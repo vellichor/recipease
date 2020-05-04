@@ -11,6 +11,7 @@ class Unit(Base):
   name=Column(String, nullable=False)
   plural_name=Column(String) # for irregular plurals
   shortname=Column(String) # eg c for cup or tbsp for tablespoon
+  system=Column(String) # imperial, metric, or neither?
 
   def get_singular(self):
     return self.name
