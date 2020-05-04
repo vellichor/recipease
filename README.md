@@ -28,3 +28,4 @@ This tool is built with Python3, Flask, SqlAlchemy, BeautifulSoup4, Jinja2, and 
 
 SqlAlchemy doesn't seem to have a great way to translate between foreign key relationships in the DB and a nested JSON representation of an object's whole extended set of friends and relations. You'll find the code to do it for you in `recipease.db.dictdb` for all the good it may do you.
 
+This tool attempts to do some light, rule-based parsing of numeric words in ingredient lists, like "a pinch of cumin" or "two dozen eggs" or "2 1/2 tsps vanilla". To really do this right we would need some dependency parsing and I've got my eye on spaCy but good gravy that's a lot of effort to go to for a cookbook. THAT SAID, parsed ingredient lists are necessary for autoscaling recipes so this is a major nice to have.
