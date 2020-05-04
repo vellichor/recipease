@@ -7,13 +7,23 @@ from recipease.utils.parsing import *
 
 def test_parse_num():
   test_cases = {
-    "3": 3.0,
+    "3 ": 3.0,
     "3.5": 3.5,
     "3   1/2": 3.5,
-    "3-1/2": 3.5
+    " 3-1/2": 3.5
   }
   for t in test_cases:
     assert test_cases[t] == parse_num(t)
+
+def test_parse_num_word():
+  test_cases = {
+    "an ": 1,
+    " two dozen ": 24,
+    " five ": 5
+  }
+  # TODO: "two and a half", "two and a quarter"
+  for t in test_cases:
+    assert test_cases[t] == parse_num_word(t)
 
 def test_parse_ingredient():
   test_cases = {
