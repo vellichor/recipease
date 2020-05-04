@@ -1,0 +1,132 @@
+{
+  "@context": "http://schema.org/",
+  "@type": "Recipe",
+  "name": "Moist Vanilla Cupcakes",
+  "author": {
+    "@type": "Person",
+    "name": "John Kanell"
+  },
+  "description": "A simple vanilla cupcake for any occasion! So moist, fluffy, and delicious you'll make them every week! &nbsp;&nbsp;",
+  "datePublished": "2019-08-25T00:00:57+00:00",
+  "image": [
+    "https://preppykitchen.com/wp-content/uploads/2018/04/Vanilla-cupcake-recipe-new.jpg",
+    "https://preppykitchen.com/wp-content/uploads/2018/04/Vanilla-cupcake-recipe-new-500x500.jpg",
+    "https://preppykitchen.com/wp-content/uploads/2018/04/Vanilla-cupcake-recipe-new-500x375.jpg",
+    "https://preppykitchen.com/wp-content/uploads/2018/04/Vanilla-cupcake-recipe-new-480x270.jpg"
+  ],
+  "recipeYield": "16",
+  "prepTime": "PT15M",
+  "cookTime": "PT20M",
+  "totalTime": "PT35M",
+  "recipeIngredient": [
+    "1 2/3 cup all-purpose flour (213g)",
+    "1 cup granulated sugar (200g)",
+    "1/4 tsp baking soda",
+    "1 1/2 tsp baking powder",
+    "1/4 tsp  kosher salt",
+    "3/4 cup unsalted butter (170g, melted)",
+    "3  egg whites (room temperature)",
+    "1 tbsp vanilla extract (15mL)",
+    "1/2 cup sour cream (120mL, room temperature)",
+    "1/2 cup whole milk (120mL, warm)",
+    "2 lb confectioners sugar (900g, sifted)",
+    "1 lb unsalted butter (450g, room temperature)",
+    "1 tsp vanilla extract",
+    "1 tbsp heavy cream",
+    "1 pinch  kosher salt",
+    "1 tsp whole milk"
+  ],
+  "recipeInstructions": [
+    {
+      "@type": "HowToSection",
+      "name": "For the Cupcakes:",
+      "itemListElement": [
+        {
+          "@type": "HowToStep",
+          "text": "Preheat oven to 350 degrees F. Place cupcake papers in a cupcake pan.",
+          "url": "https://preppykitchen.com/moist-vanilla-cupcake-recipe/#wprm-recipe-8726-step-0-0"
+        },
+        {
+          "@type": "HowToStep",
+          "text": "Sift the flour, sugar salt, baking soda and powder into a large bowl, and whisk together.",
+          "url": "https://preppykitchen.com/moist-vanilla-cupcake-recipe/#wprm-recipe-8726-step-0-1"
+        },
+        {
+          "@type": "HowToStep",
+          "text": "Separate the eggs. You can use the yolks for a custard or a batch French buttercream.",
+          "url": "https://preppykitchen.com/moist-vanilla-cupcake-recipe/#wprm-recipe-8726-step-0-2"
+        },
+        {
+          "@type": "HowToStep",
+          "text": "In another bowl, whisk together the wet ingredients until combined. (The batter may be clumpy, do not worry!)",
+          "url": "https://preppykitchen.com/moist-vanilla-cupcake-recipe/#wprm-recipe-8726-step-0-3"
+        },
+        {
+          "@type": "HowToStep",
+          "text": "Add the wet ingredients to the dry ingredients. Mix until combined.",
+          "url": "https://preppykitchen.com/moist-vanilla-cupcake-recipe/#wprm-recipe-8726-step-0-4"
+        },
+        {
+          "@type": "HowToStep",
+          "text": "Distribute the batter evenly into cupcake papers, filling each paper with about 2/3 the way up.",
+          "url": "https://preppykitchen.com/moist-vanilla-cupcake-recipe/#wprm-recipe-8726-step-0-5"
+        },
+        {
+          "@type": "HowToStep",
+          "text": "Bake for about 18 minutes or until centers are springy to the touch.",
+          "url": "https://preppykitchen.com/moist-vanilla-cupcake-recipe/#wprm-recipe-8726-step-0-6"
+        }
+      ]
+    },
+    {
+      "@type": "HowToSection",
+      "name": "For the Buttercream:",
+      "itemListElement": [
+        {
+          "@type": "HowToStep",
+          "text": "In a stand mixer fitted with a paddle attachment, cream the room temperature butter. Add in the confectioners sugar in two batches. Add salt, milk, cream and vanilla. Mix until fluffy.",
+          "url": "https://preppykitchen.com/moist-vanilla-cupcake-recipe/#wprm-recipe-8726-step-1-0"
+        },
+        {
+          "@type": "HowToStep",
+          "text": "Transfer to a piping bag.",
+          "url": "https://preppykitchen.com/moist-vanilla-cupcake-recipe/#wprm-recipe-8726-step-1-1"
+        },
+        {
+          "@type": "HowToStep",
+          "text": "Pipe a large dollop of buttercream on each cupcake.",
+          "url": "https://preppykitchen.com/moist-vanilla-cupcake-recipe/#wprm-recipe-8726-step-1-2"
+        }
+      ]
+    }
+  ],
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.99",
+    "ratingCount": "159"
+  },
+  "recipeCategory": [
+    "Dessert"
+  ],
+  "recipeCuisine": [
+    "American"
+  ],
+  "keywords": "How to make vanilla cupcakes, moist vanilla cupcake recipe",
+  "nutrition": {
+    "@type": "NutritionInformation",
+    "servingSize": "1 Cupcake",
+    "calories": "270 kcal",
+    "carbohydrateContent": "29 g",
+    "fatContent": "7 g",
+    "saturatedFatContent": "6 g",
+    "cholesterolContent": "55 mg",
+    "sodiumContent": "98 mg",
+    "sugarContent": "15 g",
+    "unsaturatedFatContent": "1 g"
+  },
+  "@id": "https://preppykitchen.com/moist-vanilla-cupcake-recipe/#recipe",
+  "isPartOf": {
+    "@id": "https://preppykitchen.com/moist-vanilla-cupcake-recipe/#article"
+  },
+  "mainEntityOfPage": "https://preppykitchen.com/moist-vanilla-cupcake-recipe/#webpage"
+}

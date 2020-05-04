@@ -1,4 +1,6 @@
 import isodate
+from isodate.isoerror import ISO8601Error
+from datetime import datetime, timedelta
 
 from recipease.db.models import *
 
@@ -120,6 +122,10 @@ def parse_author(author):
   }
 
 def parse_images(images):
+  # did we get a bare string? if so, listify it.
+  if type(images) == str:
+    images = [images]
+  # wrap each url in an image object and then save it to the db
   return {
     'class': ImageSet,
     'images': list(map(lambda x: {
@@ -135,7 +141,7 @@ def parse_step(step):
     'name': step.get('name'),
     'text': step.get('text'),
     'url': step.get('url'),
-    'image': parse_images(step.get('image'))
+    'image': parse_images(step.get('image', []))
   }
 
 def parse_section(section):
@@ -149,30 +155,60 @@ def parse_steps(steps, name=None):
   steps_list = []
   # this may recur.
   for step in steps:
-    if steps['@type'] == 'HowToSection':
+    if step['@type'] == 'HowToSection':
       steps_list.append(parse_section(step))
     else:
       steps_list.append(parse_step(step))
   # we now have to just brute force whang the order into the dictionary
   for i in range(len(steps_list)):
-    parse_steps[i]['order'] = i
+    steps_list[i]['order'] = i
   return steps_list
+
+def parse_datetime(d_str):
+  try:
+    return isodate.parse_datetime(d_str)
+  except(ISO8601Error):
+    try:
+      date = isodate.parse_date(d_str)
+      return datetime.combine(date, datetime.min.time())
+    except(ISO8601Error):
+      return None
+
+# from an ISO8601 duration, give the minutes as an int
+def duration_to_minutes(dur_str):
+  try:
+    td = isodate.parse_duration(dur_str)
+    return int(((td.days * (24*60*60)) + td.seconds) / 60)
+  except(Exception):
+    return None
+
+def minutes_to_duration(min):
+  return isodate.duration_isoformat(timedelta(seconds=min*60))
 
 def parse_recipe(recipe):
   recipe_dict = {
     'class': Recipe,
+    # direct attributes
     'name': recipe.get('name'),
     'description': recipe.get('description'),
-    'date_published': isodate.parse_datetime(recipe.get('datePublished')),
-    'prep_time': isodate.parse_duration(recipe.get('prepTime')),
-    'cook_time': isodate.parse_duration(recipe.get('cookTime')),
+    'date_published': parse_datetime(recipe.get('datePublished')),
+    'prep_time': duration_to_minutes(recipe.get('prepTime')),
+    'cook_time': duration_to_minutes(recipe.get('cookTime')),
     'category': recipe.get('recipeCategory'),
     'cuisine': recipe.get('recipeCuisine'),
-    'author': parse_author(recipe.get('author')), # one to many
-    'images': parse_images(recipe.get('image')), # many to many
-    'ingredients': parse_ingredients(recipe.get('recipeIngredient'), []), # many to one
+    # one to many
+    'author': parse_author(recipe.get('author')),
+    # many to many
+    'images': parse_images(recipe.get('image', [])),
+    # many to one
+    'ingredients': parse_ingredients(recipe.get('recipeIngredient', [])),
     'steps': parse_steps(recipe.get('recipeInstructions', []))
   }
+  # HACK i don't want to build new models at 10pm
+  if isinstance(recipe_dict['category'], list):
+    recipe_dict['category'] = recipe_dict['category'][0]
+  if isinstance(recipe_dict['cuisine'], list):
+    recipe_dict['cuisine'] = recipe_dict['cuisine'][0]
   if not (recipe_dict['name'] and recipe_dict['images'] and len(recipe_dict['steps']) > 0):
     raise ValueError("Recipe must have name, image, and recipeInstructions");
   return recipe_dict
