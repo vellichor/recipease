@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{%block title %}Thank You{% endblock %}
+{%block content %}
+<div style="position:relative; top: 100px">
+<p>Thank you for sharing the goals of your work with me.</p>
+<p>I've received your request, and will carefully consider how to best help you achieve your goals. I'll send you email at {{ email }} when I have had a chance to make a thoughtful recommendation.</p>
+{% if contact %}
+<p>I'll also make sure to let you know when Stellarator has something new for you. You can unsubscribe from this at any time.</p>
+{% else %}
+<p>You won't receive any other email from me or be added to any mailing list.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{%block title %}Personal Workings{% endblock %}
+{%block content %}
+<div style="position:relative; border: 5px solid #ffffee; height: 800px">
+  <div style="position: absolute; background-color: #ffffee; opacity: 0.2; height: 800px; width: 100%">&nbsp;potato</div>
+  <div style="position: absolute; opacity: 1.0">
+    <p>Stellarator specializes in [some stuff. You tell me!]</p>
+    <p>Tell me what you want to accomplish, and I will return a personal recommendation of items, herbs, or other functional products that can be made to order for your needs.</p>
+  <form action="/submit" method="POST">
+    <textarea name="message" style="background-color: #ffffee; color: #000000; font-style: bold; font-size: 14pt" rows="12" cols="80">What good do you want to do today?</textarea><br>
+    Email: <input type="text" name="email"><br>
+    <input type="checkbox" name="contact_opt_in"> YES, please send me email when Stellarator has news or new products.<br>
+    <input type="submit"> 
+  </form>
+  </div>
+</div>
+{% endblock %}

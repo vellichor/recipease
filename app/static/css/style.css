@@ -1,0 +1,63 @@
+body {
+  color: #660033;
+  background: #ffffee;
+/*
+  url("/static/images/background.png") no-repeat fixed center center;
+  background-size: contain;
+*/
+}
+
+a {
+  color: #660033;
+}
+
+div {
+  color: #660033;
+}
+
+#menubar {
+  position: fixed;
+  top: 0;
+  height: 8%;
+  width: 100%;
+  text-align: center;
+  vertical-align: bottom;
+  z-index: 10;
+  opacity: 1.0;
+  background-color: #ffffee;
+}
+
+#content {
+  position: relative;
+  top: 100px;
+  width: 70%;
+  left: 15%;
+}
+
+.center {
+  text-align: center;
+}
+
+.bottom {
+  position: absolute;
+  bottom: 0px;
+}
+
+#footer {
+  position: fixed;
+  bottom: 0;
+  right: 40px;
+  z-index: 5;
+  background-color: #ffffee;
+  opacity: 1.0;
+}
+
+#ingredient-name {
+  text-align: right;
+  padding-right: 20px;
+}
+
+#ingredient-desc {
+  text-align: left; 
+  padding-left: 20px;
+}

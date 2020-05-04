@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{%block title %}Herbs and Items We Use{% endblock %}
+{%block content %}
+<div style="position:relative; top: 50px;">
+  <table style="display: inline-block;">
+  {% for item in items %}
+  <tr>
+    <td id="ingredient-name">{{ item.name }}</td>
+    <td id="ingredient-desc">{{ item.descr }}</td>
+  </tr>
+  {% endfor %}
+  </table>
+<p>Stellarator items are made from edible, non-toxic ingredients unless otherwise labeled, but they are not food or medicine. They are not intended to diagnose, treat, or cure any illness. Please don't take anything internally unless directed to by a physician.</p>
+</div>
+
+{% endblock %}

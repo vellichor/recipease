@@ -1,0 +1,26 @@
+version: '3'
+services:
+  web:
+    build: .
+    volumes:
+    - ./app/main.py:/app/main.py
+    - ./app/recipease:/app/recipease
+    - ./app/templates:/app/templates
+    - ./app/static:/app/static
+    - ./test:/test
+    environment:
+    - MYSQL_HOST=mysql
+    - MYSQL_USER=mysql
+    - MYSQL_PASSWORD=pass123
+    ports:
+    - "8080:80"
+  mysql:
+    image: mysql:5.7
+    #volumes:
+    #- ./sql/migrations/up:/docker-entrypoint-initdb.d
+    environment:
+    - MYSQL_RANDOM_ROOT_PASSWORD=yes
+    - MYSQL_USER=mysql
+    - MYSQL_PASSWORD=pass123
+    ports:
+    - "3306:3306"
