@@ -14,10 +14,12 @@ services:
     - MYSQL_PASSWORD=pass123
     ports:
     - "8080:80"
+    links:
+    - mysql
   mysql:
     image: mysql:5.7
-    #volumes:
-    #- ./sql/migrations/up:/docker-entrypoint-initdb.d
+    volumes:
+    - ./sql/grant_create.sql:/docker-entrypoint-initdb.d/grant_create.sql
     environment:
     - MYSQL_RANDOM_ROOT_PASSWORD=yes
     - MYSQL_USER=mysql
