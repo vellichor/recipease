@@ -81,7 +81,7 @@ class Image(Base):
   __table_args__ = (UniqueConstraint('image_set_id', 'url'),)
 
   def __repr__(self):
-    return "<Image {} in set {}>".format(self.url, self.image_set)
+    return "<Image {} in set {}>".format(self.url, self.image_set_id)
 
 class ImageSet(Base):
   __tablename__='image_set'
