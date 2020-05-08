@@ -98,13 +98,14 @@ def test_save_dict(empty_db_session):
     },
     'denom_qty': 1
   }
-  conv = save_dict(conv_dict, empty_db_session)
-  # the saved dictionary should now contain a numeric index
-  assert type(conv_dict['num_unit_id']) == int
+  conv_id = save_dict(conv_dict, empty_db_session)
+  # we should be able to retrieve the freshly created object
+  conv = empty_db_session.query(Conversion).filter(Conversion.id == conv_id).one()
+  # the saved object should now contain a numeric index
+  assert type(conv.num_unit_id) == int
   # if we retrieve that it should be the right thing
-  results = empty_db_session.query(Unit).filter(Unit.id == conv_dict['num_unit_id']).all()
-  assert len(results) == 1
-  assert results[0].name == 'cup'
+  num_unit = empty_db_session.query(Unit).filter(Unit.id == conv.num_unit_id).one()
+  assert num_unit.name == 'cup'
 
 
 
