@@ -7,7 +7,6 @@ from fixtures.db import empty_db_session
 
 import pytest
 
-
 def test_class_to_foreign_key():
   assert 'unit_id' == class_to_foreign_key(Unit)
 

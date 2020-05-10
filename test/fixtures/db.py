@@ -16,6 +16,7 @@ def empty_db_session():
   try:
     if not database_exists(engine.url):
       create_database(engine.url)
+    # create the current schema, empty
     Base.metadata.create_all(engine)
     Session = sessionmaker(bind=engine)
     session = Session()

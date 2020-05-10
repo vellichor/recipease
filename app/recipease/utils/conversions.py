@@ -1,5 +1,9 @@
+#from sqlalchemy import in_
+
 from recipease.db.models import Unit, Conversion
-from recipease.db.connection import session_scope
+from recipease.db.dictdb import *
+
+# from sqlalchemy import or_, and_, not_
 
 # basic units we always have
 # as (longname, plural, shortname)
@@ -46,32 +50,30 @@ conversions = [
   [14, "lb", 1, "st"],
   [2000, "lb", 1, "ton"],
   # cross-system
-  [3.78541, "L", 1, "gal"]
-  # assume we're on earth!
-  [101.97, "g", 1, "N"]
+  [3.78541, "L", 1, "gal"],
+  # weight to weight, we'll use g to get to mass JUST IN CASE lol 
+  [1, "lb", 4.45, "N"]
 ]
 
 # these use save_dict, which is idempotent.
-def create_all_units():
-  with session_scope as session:
-    for u in map(lambda x: {"name": x[0],
-                            "plural_name": x[1],
-                            "shortname": x[2],
-                            "class": Unit
-                            },
-                  units):
-      save_dict(u, sesssion)
+def create_all_units(session):
+  for u in map(lambda x: {"name": x[0],
+                          "plural_name": x[1],
+                          "shortname": x[2],
+                          "class": Unit
+                          },
+                units):
+    save_dict(u, session)
 
-def create_all_conversions():
-  with session_scope as session:
-    for c in map(lambda x: {"num_qty": x[0],
-                            "num_unit_id": get_unit(x[1]),
-                            "denom_qty": x[2],
-                            "denom_unit_id": get_unit(x[3]),
-                            "class": Conversion
-                            },
-                  conversions):
-      save_dict(c, session)
+def create_all_conversions(session):
+  for c in map(lambda x: {"num_qty": x[0],
+                          "num_unit_id": get_unit(x[1], session).id,
+                          "denom_qty": x[2],
+                          "denom_unit_id": get_unit(x[3], session).id,
+                          "class": Conversion
+                          },
+                conversions):
+    save_dict(c, session)
 
 # prefixes as (name, exponent, shortname)
 # we will only go to 15 because what the hell are we going to want with a yg of cinnamon
@@ -98,99 +100,90 @@ metric_prefixes = [
   ("exa", 15, "E")
 ]
 
-def get_unit(name):
+def get_unit(name, session):
   # look it up by name, shortname, or plural name
-  with session_scope as session:
-    return session.query(Unit).filter(Unit.name == name \
-                                or Unit.shortname == name \
-                                or Unit.plural_name == name) \
-      .one()
+  return session.query(Unit).filter((Unit.name == name) \
+                              | (Unit.shortname == name) \
+                              | (Unit.plural_name == name)) \
+    .one()
 
 # get a density in terms of the density of room temperature water
-def get_density(vol_unit, vol_qty, amt_unit, amt_qty, g=None):
+def get_density(vol_unit, vol_qty, amt_unit, amt_qty, session, g=None):
   # water is 1g/mL
-  # convert the volume to milliliters
-  ml_vol = convert(vol_qty, vol_unit, 'mL')
-  g_mass = convert(amt_qty, amt_unit, 'g', g)
-  return g_mass / ml_vol
+  # convert the volume to liters, since mL is not a true unit
+  l_vol = convert_qty(vol_qty, vol_unit, get_unit('liter', session), session, g=g)
+  g_mass = convert_qty(amt_qty, amt_unit, get_unit('g', session), session, g=g)
+  return g_mass / (l_vol * 1000)
 
-def get_metaconversions(from_qty, from_unit, density=1, g=9.81):
-  converted = []
+def get_metaconversions(from_unit, from_qty, session, density=1, g=9.81):
+  converted = {} # leave room for many metaconversions if we decide to change how we do prefixes
   # do any metaconversion that's appropriate
   if (from_unit.name == 'Newton'):
     # make sure they aren't aliens
     if g/9.81 > 1.000000001 or 9.81/g > 1.000000001:
       print("Dude, where the fuck ARE you?")
-    converted.append({
-                      'unit': get_unit('gram'),
-                      'qty': g / from_qty
-                    }
+    converted[get_unit('gram', session)] = (from_qty * 1000) / g
   if (from_unit.name == 'gram'):
-    converted.append({
-                      'unit': get_unit('Newton'),
-                      'qty': from_qty / g
-                    }
+    converted[get_unit('Newton', session)] = (from_qty / 1000) * g
   # need to do density in base units but it's always given in g/mL for human reasons
   if (from_unit.name == 'liter'):
-    converted.append({
-                      'unit': get_unit('gram'),
-                      'qty': from_qty / (1000 * density)
-                    }
-  if (from_unit.name == 'liter'):
-    converted.append({
-                      'unit': get_unit('gram'),
-                      'qty': from_qty / (1000 * density)
-                    }
-
+    converted[get_unit('gram', session)] = from_qty * 1000 / density
+  if (from_unit.name == 'gram'):
+    converted[get_unit('liter', session)] = from_qty * density / 1000
+  return converted
 
 # to_unit is what we are looking for and we'll recursively crawl down until we find it.
-def convert_qty(from_qty, from_unit, to_unit, density=1, g=9.81, depth=0, known_units=[]):
+# note that we mostly actually have discrete objects for prefix-derived SI units!
+# we nice up the display at display time.
+def convert_qty(from_unit, from_qty, to_unit, session, density=1, g=9.81, depth=0, known_units=set()):
   # safety check
   if depth > 30:
     raise RecursionError("max recursion depth exceeded for conversion")
-  # base case
+  # base case 1: identity
   if from_unit == to_unit:
     return {'unit': from_unit,
             'qty': from_qty}
-  # not there yet. get all possible direct conversions from this unit
+  # base case 2: direct conversion exists
+  # get all possible direct conversions from this unit
   # (that haven't been tried in a previous iteration)
-  known_units += from_unit
-  converted = get_metaconversions(from_qty, from_unit, density, g) \
-    + get_conversions_for(from_qty, from_unit, known_units)
-  # 
-  known_units += list(map(lambda x: x.unit, converted))
-  for c in converted:
-    # check them all.
-    conversion = convert_qty(c.qty, c.unit, to_unit, density=density, g=g, depth=depth+1, known_units=known_units)
+  known_units.add(from_unit)
+  converted = get_metaconversions(from_unit, from_qty, density, g) \
+    .update(get_conversions_for(from_unit, from_qty, session, known_units))
+  if to_unit in converted.keys():
+    return {'unit': to_unit, 
+            'qty': converted[to_unit]
+            }
+  # not in the direct conversions either.
+  # recursively convert each direct conversion of this, and return any success.
+  # don't check units we saw already.
+  known_units.update(converted.keys())
+  for unit, qty in converted.items():
+    conversion = convert_qty(unit, qty, to_unit, session, density=density, g=g, depth=depth+1, known_units=known_units)
     if conversion is not None:
       return conversion
+  # we have seen every unit and found no conversion!
+  return None
 
-def get_conversions_for(from_qty, from_unit, known_units=[]):
+def get_conversions_for(from_unit, from_qty, session, known_units=[]):
   known_unit_ids = list(map(lambda x: x.id, known_units))
   # convert this by all possible direct unit conversions (that we have not seen)
-  conversions = []
+  conversions = {}
   # forward
-  for c in session.query(Conversion)\
-            .filter(Conversion.num_unit_id == from_unit.id \
-                    and Conversion.denom_unit_id not in known_unit_ids)\
-            .join(Unit)
+  for c in session.query(Conversion) \
+            .filter((Conversion.num_unit_id == from_unit.id) \
+                    & (~ (Conversion.denom_unit_id.in_(known_unit_ids))))\
             .all():
     # perform the conversion
-    conversions.add({
-                      'unit': c.unit.name,
-                      'qty': from_qty * c.denom_qty / c.num_qty
-                    })
+    conversions[get_unit(c.denom_unit_id, session)] \
+      = from_qty * c.denom_qty / c.num_qty
   # backward
-  for c in session.query(Conversion)\
-            .filter(Conversion.denom_unit_id == from_unit.id \
-                    and Conversion.num_unit_id not in known_unit_ids)\
-            .join(Unit)
+  for c in session.query(Conversion) \
+            .filter((Conversion.denom_unit_id == from_unit.id) \
+                    & (~ (Conversion.num_unit_id.in_(known_unit_ids))))\
             .all():
     # perform the conversion
-    conversions.add({
-                      'unit': c.unit.name,
-                      'qty': from_qty * c.denum_qty / c.denom_qty
-                    })
+    conversions[get_unit(c.num_unit_id, session)] \
+      = from_qty * c.denum_qty / c.denom_qty
   return conversions
 
 # niceness is a comparator.
