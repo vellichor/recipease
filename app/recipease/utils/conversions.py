@@ -4,6 +4,7 @@ from recipease.db.models import Unit, Conversion
 from recipease.db.dictdb import *
 
 # from sqlalchemy import or_, and_, not_
+from sqlalchemy.orm.exc import NoResultFound
 
 # basic units we always have
 # as (longname, plural, shortname)
@@ -102,10 +103,19 @@ metric_prefixes = [
 
 def get_unit(name, session):
   # look it up by name, shortname, or plural name
-  return session.query(Unit).filter((Unit.name == name) \
+  try:
+    return session.query(Unit).filter((Unit.name == name) \
                               | (Unit.shortname == name) \
                               | (Unit.plural_name == name)) \
-    .one()
+      .one()
+  except(NoResultFound) as exc:
+    raise ValueError("No unit named {}".format(name))
+
+def get_unit_by_id(id, session):
+  try:
+    return session.query(Unit).filter(Unit.id == id).one()
+  except(NoResultFound) as exc:
+    raise ValueError("No unit with id {}".format(id))
 
 # get a density in terms of the density of room temperature water
 def get_density(vol_unit, vol_qty, amt_unit, amt_qty, session, g=None):
@@ -126,16 +136,18 @@ def get_metaconversions(from_unit, from_qty, session, density=1, g=9.81):
   if (from_unit.name == 'gram'):
     converted[get_unit('Newton', session)] = (from_qty / 1000) * g
   # need to do density in base units but it's always given in g/mL for human reasons
-  if (from_unit.name == 'liter'):
-    converted[get_unit('gram', session)] = from_qty * 1000 / density
-  if (from_unit.name == 'gram'):
-    converted[get_unit('liter', session)] = from_qty * density / 1000
+  # we can suppress these conversions by explicitly passing density=None
+  if density:
+    if (from_unit.name == 'liter'):
+      converted[get_unit('gram', session)] = from_qty * 1000 / density
+    if (from_unit.name == 'gram'):
+      converted[get_unit('liter', session)] = from_qty * density / 1000
   return converted
 
 # to_unit is what we are looking for and we'll recursively crawl down until we find it.
 # note that we mostly actually have discrete objects for prefix-derived SI units!
 # we nice up the display at display time.
-def convert_qty(from_unit, from_qty, to_unit, session, density=1, g=9.81, depth=0, known_units=set()):
+def convert_qty(from_unit, from_qty, to_unit, session, density=1, g=9.81, depth=0, known_units=None):
   # safety check
   if depth > 30:
     raise RecursionError("max recursion depth exceeded for conversion")
@@ -146,18 +158,21 @@ def convert_qty(from_unit, from_qty, to_unit, session, density=1, g=9.81, depth=
   # base case 2: direct conversion exists
   # get all possible direct conversions from this unit
   # (that haven't been tried in a previous iteration)
+  if not known_units:
+    known_units=set()
   known_units.add(from_unit)
-  converted = get_metaconversions(from_unit, from_qty, density, g) \
-    .update(get_conversions_for(from_unit, from_qty, session, known_units))
-  if to_unit in converted.keys():
+  conversions = get_metaconversions(from_unit, from_qty, session, density, g)
+  conversions.update(get_conversions_for(from_unit, from_qty, \
+                                          session, known_units))
+  if to_unit in conversions.keys():
     return {'unit': to_unit, 
-            'qty': converted[to_unit]
+            'qty': conversions[to_unit]
             }
   # not in the direct conversions either.
   # recursively convert each direct conversion of this, and return any success.
   # don't check units we saw already.
-  known_units.update(converted.keys())
-  for unit, qty in converted.items():
+  known_units.update(conversions.keys())
+  for unit, qty in conversions.items():
     conversion = convert_qty(unit, qty, to_unit, session, density=density, g=g, depth=depth+1, known_units=known_units)
     if conversion is not None:
       return conversion
@@ -174,7 +189,7 @@ def get_conversions_for(from_unit, from_qty, session, known_units=[]):
                     & (~ (Conversion.denom_unit_id.in_(known_unit_ids))))\
             .all():
     # perform the conversion
-    conversions[get_unit(c.denom_unit_id, session)] \
+    conversions[get_unit_by_id(c.denom_unit_id, session)] \
       = from_qty * c.denom_qty / c.num_qty
   # backward
   for c in session.query(Conversion) \
@@ -182,12 +197,19 @@ def get_conversions_for(from_unit, from_qty, session, known_units=[]):
                     & (~ (Conversion.num_unit_id.in_(known_unit_ids))))\
             .all():
     # perform the conversion
-    conversions[get_unit(c.num_unit_id, session)] \
-      = from_qty * c.denum_qty / c.denom_qty
+    conversions[get_unit_by_id(c.num_unit_id, session)] \
+      = from_qty * c.num_qty / c.denom_qty
   return conversions
 
-# niceness is a comparator.
+# WIP ON PRESENTATION CONVERSIONS
+#
+# We want to be able to take a measure like "56 cups"
+# and know that "7 gallons" is a way better thing to display.
+#
+# We should also show appropriate SI prefixes on metric values.
+#
 ## what's a nice number?
+# niceness is a comparator.
 #def is_nice(qty):
 #  (whole, f_num, f_denom) = get_partial_frac(qty)
 #  # a small whole number is nice

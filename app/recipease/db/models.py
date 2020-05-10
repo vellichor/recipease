@@ -54,9 +54,9 @@ class Conversion(Base): # 3 teaspoons = 1 tablespoon
   __tablename__='conversion'
   id=Column(Integer, primary_key=True)
   num_unit_id=Column(Integer, ForeignKey('unit.id'), nullable=False)
-  num_qty=Column(Integer, nullable=False)
+  num_qty=Column(Float, nullable=False)
   denom_unit_id=Column(Integer, ForeignKey('unit.id'), nullable=False)
-  denom_qty=Column(Integer, nullable=False)
+  denom_qty=Column(Float, nullable=False)
   __table_args__ = (UniqueConstraint('num_unit_id', 'denom_unit_id', name='uq_unit_pair'),)
 
   def __repr__(self):
