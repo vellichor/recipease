@@ -33,7 +33,7 @@ units = [
 # we will give "3 tsp = 1 tbsp" as (3, "tsp", 1, "tbsp")
 
 conversions = [
-  [2, "smidgen", 1, "dash"],
+  [2, "smidgen", 1, "dash "],
   [2, "dash", 1, "pinch"],
   [8, "pinch", 1, "tsp"],
   [3, "tsp", 1, "tbsp"],
@@ -51,6 +51,7 @@ conversions = [
   [101.97, "g", 1, "N"]
 ]
 
+# these use save_dict, which is idempotent.
 def create_all_units():
   with session_scope as session:
     for u in map(lambda x: {"name": x[0],
@@ -72,14 +73,14 @@ def create_all_conversions():
                   conversions):
       save_dict(c, session)
 
-
 # prefixes as (name, exponent, shortname)
 # we will only go to 15 because what the hell are we going to want with a yg of cinnamon
 # like seriously only a homeopathic "doctor" would care
 # like how much even does a molecule of cinnamol weigh
 # ok it's 1.276zg so a yg of cinnamol doesn't even exist
 # and a Yg is the mass of the EARTH
-# this is why you don't let the nerds have the computer late at night when they've been drinking
+# this is why you don't let the nerds have the computer
+# late at night when they've been drinking
 metric_prefixes = [
   ("deci", -1, "d"),
   ("centi", -2, "c"),
@@ -103,7 +104,7 @@ def get_unit(name):
     return session.query(Unit).filter(Unit.name == name \
                                 or Unit.shortname == name \
                                 or Unit.plural_name == name) \
-      .fetch_one()
+      .one()
 
 # get a density in terms of the density of room temperature water
 def get_density(vol_unit, vol_qty, amt_unit, amt_qty, g=None):
