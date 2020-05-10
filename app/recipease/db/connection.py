@@ -11,8 +11,7 @@ def get_engine(db, host=os.environ.get('MYSQL_HOST'),
   return create_engine(url, pool_recycle=3600)
 
 
-# set up the product db and use reflection to get the tables inside
-engine = get_engine(db="stellarator")
+engine = get_engine(db="recipease")
 Session = sessionmaker(bind=engine)
 
 @contextmanager
