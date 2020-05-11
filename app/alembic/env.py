@@ -3,6 +3,7 @@ import os
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
+from sqlalchemy_utils.functions import database_exists, create_database
 
 from alembic import context
 
@@ -77,6 +78,10 @@ def run_migrations_online():
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
+
+    # do the right thing even if no database existed yet!
+    if not database_exists(connectable.url):
+      create_database(connectable.url)
 
     with connectable.connect() as connection:
         context.configure(
