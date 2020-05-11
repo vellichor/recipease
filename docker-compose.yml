@@ -4,6 +4,8 @@ services:
     build: .
     volumes:
     - ./app/main.py:/app/main.py
+    - ./app/alembic.ini:/app/alembic.ini
+    - ./app/alembic:/app/alembic
     - ./app/recipease:/app/recipease
     - ./app/templates:/app/templates
     - ./app/static:/app/static
@@ -12,6 +14,7 @@ services:
     - MYSQL_HOST=mysql
     - MYSQL_USER=mysql
     - MYSQL_PASSWORD=pass123
+    - MYSQL_DB=recipease
     ports:
     - "8080:80"
     links:
