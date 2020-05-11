@@ -1,6 +1,7 @@
 FROM tiangolo/uwsgi-nginx-flask:python3.6-alpine3.7
 
-RUN apk update && apk add g++ make python3-dev mariadb-dev libxml2-dev libxslt-dev
+RUN apk update && apk add g++ make python3-dev mariadb-dev \
+                          libxml2-dev libxslt-dev bash
 
 RUN pip3 install --upgrade pip
 COPY requirements.txt /requirements.txt
