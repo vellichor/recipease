@@ -3,12 +3,7 @@ services:
   web:
     build: .
     volumes:
-    - ./app/main.py:/app/main.py
-    - ./app/alembic.ini:/app/alembic.ini
-    - ./app/alembic:/app/alembic
-    - ./app/recipease:/app/recipease
-    - ./app/templates:/app/templates
-    - ./app/static:/app/static
+    - ./app:/app
     - ./test:/test
     environment:
     - MYSQL_HOST=mysql
