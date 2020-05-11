@@ -16,16 +16,12 @@ def homepage():
 
 @app.route("/recipe/import", methods=['GET', 'POST'])
 def decode():
-  print("IS THIS THING ON")
   recipes=[]
   if request.form:
-    print("Got a form submission")
     url = request.form.get('url')
-    print("Got recipe url {}".format(url))
     if url:
       recipe = parse_recipe(get_recipe(url))
-      print("Got recipe {}".format(recipe))
-      recipes.add(recipe)
+      recipes.append(recipe)
       #recipe_dict = save_dict(recipe)
   body = env.get_template("import.html").render(recipes=recipes)
   return app.response_class(response=body,
