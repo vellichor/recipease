@@ -14,18 +14,20 @@ def homepage():
                               status=200,
                               mimetype='text/html')
 
-@app.route("/decode", methods=['GET', 'POST'])
+@app.route("/recipe/import", methods=['GET', 'POST'])
 def decode():
-  body = "nothing to see here, folks"
-  mimetype = 'text/html'
+  print("IS THIS THING ON")
+  recipes=[]
   if request.form:
+    print("Got a form submission")
     url = request.form.get('url')
+    print("Got recipe url {}".format(url))
     if url:
       recipe = parse_recipe(get_recipe(url))
-      recipe_dict = save_dict(recipe)
-      body = recipe_dict
-      mimetype = 'application/json'
-  # render the page, with or without a decoded card.
+      print("Got recipe {}".format(recipe))
+      recipes.add(recipe)
+      #recipe_dict = save_dict(recipe)
+  body = env.get_template("import.html").render(recipes=recipes)
   return app.response_class(response=body,
                               status=200,
-                              mimetype=mimetype)
+                              mimetype='text/html')

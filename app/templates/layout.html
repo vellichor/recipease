@@ -3,20 +3,15 @@
 <head>
     {% block head %}
     <link rel="stylesheet" href="/static/css/style.css" />
-    <title>{% block title %}{% endblock %} - Stellarator</title>
+    <title>{% block title %}{% endblock %} - Recipease</title>
     {% endblock %}
 </head>
 <body>
-    <div id="menubar">{% block menubar %}{% include "menu.html" %}{% endblock %}</div><div style="position:relative; border: 5px solid #ffffee; height: 800px">
-        <div style="position: absolute; background-color: #ffffee; opacity: 0.2; height: 800px; width: 100%">&nbsp;potato</div>
-        <div id="content" class="center" style="position: absolute; opacity: 1.0">
-        {% block content %}{% endblock %}
-        </div>
-    </div>
-
+    <div id="menubar">{% block menubar %}{% include "menu.html" %}{% endblock %}</div> 
+    <div id="content" class="center" width="100%">{% block content %}{% endblock %}</div>
     <div id="footer">
         {% block footer %}
-        &copy; Copyright 2020 by <a href="http://www.perpetualmayhem.com/">Perpetual Mayhem, LLC</a>.
+        &copy; Copyright 2020 by <a href="http://perpetualmayhem.com/">Perpetual Mayhem, LLC</a>.
         {% endblock %}
     </div>
 </body>

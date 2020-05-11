@@ -3,6 +3,7 @@ from isodate.isoerror import ISO8601Error
 from datetime import datetime, timedelta
 
 from recipease.db.models import *
+from recipease.db.connection import session_scope
 
 NUM_WORDS={
   "one": 1,
@@ -103,7 +104,7 @@ def parse_ingredient(ingr):
 
 def get_known_units():
   units = {}
-  with session_scope as session:
+  with session_scope() as session:
     for u in session.query(Unit).all():
       units.merge(reduce(lambda x, y: x.merge(y),
                           map(lambda x: {x: u.id},

@@ -1,0 +1,16 @@
+{% extends "top_pane_layout.html" %}
+{%block title %}Home{% endblock %}
+{%block content %}
+<div style="position:relative; border: 5px solid #ffffee; height: 800px width: 100%">
+  <div style="position: absolute; background-color: #ffffee; opacity: 0.2; height: 800px; width: 100%">&nbsp;</div>
+  <div style="position: absolute; opacity: 1.0">
+    {% for recipe_str in recipes %}
+    <p>{{recipe_str}}</p>
+    {% endfor %}
+  <form action="/recipe/import" method="POST">
+    Recipe URL: <input type="text" name="url"><br>
+    <input type="submit"> 
+  </form>
+  </div>
+</div>
+{% endblock %}

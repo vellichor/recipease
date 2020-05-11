@@ -11,7 +11,7 @@ def get_engine(db, host=os.environ.get('MYSQL_HOST'),
   return create_engine(url, pool_recycle=3600)
 
 
-engine = get_engine(db="recipease")
+engine = get_engine(db=os.environ.get('MYSQL_DB'))
 Session = sessionmaker(bind=engine)
 
 @contextmanager
